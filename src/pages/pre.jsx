@@ -35,7 +35,9 @@ function emailToId(email = "") {
 }
 
 async function sendPreIntake(payloadForm) {
-    const id = emailToId(payloadForm?.email ?? "");
+    const cleanEmail = payloadForm?.email?.trim();
+    if (!cleanEmail) throw new Error("No se pudo leer el correo para guardar.");
+    const id = emailToId(cleanEmail);
     if (!id) throw new Error("No se pudo leer el correo para guardar.");
 
     const payload = { id, data: payloadForm, type: "general" };
@@ -51,7 +53,7 @@ async function sendPreIntake(payloadForm) {
         throw new Error(text || `Error HTTP ${res.status}`);
     }
 
-    return id;
+    return cleanEmail;
 }
 
 async function checkEmailExists(email) {
@@ -193,9 +195,8 @@ export default function PreIntake({ onDone }) {
         try {
             const found = await checkEmailExists(form.email);
             if (found) {
-                const existingId = emailToId(form.email);
-                const destination =
-                    redirectTarget && existingId ? `/${redirectTarget}/${encodeURIComponent(existingId)}` : "/";
+                const fullEmail = form.email?.trim();
+                const destination = redirectTarget && fullEmail ? `/${redirectTarget}/${fullEmail}` : "/";
                 navigate(destination, { replace: true });
                 return;
             }
@@ -217,9 +218,8 @@ export default function PreIntake({ onDone }) {
         setSubmitting(true);
         setSubmitFeedback(null);
         try {
-            const savedId = await sendPreIntake(form);
-            const destination =
-                redirectTarget && savedId ? `/${redirectTarget}/${encodeURIComponent(savedId)}` : "/";
+            const savedEmail = await sendPreIntake(form);
+            const destination = redirectTarget && savedEmail ? `/${redirectTarget}/${savedEmail}` : "/";
             const successMessage = redirectTarget
                 ? `Datos enviados. Preparando tu cuestionario ${redirectTarget}...`
                 : "Datos enviados correctamente. Redirigiendo...";

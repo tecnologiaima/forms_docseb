@@ -1,4 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+} from "react-router-dom";
 
 import IKDC from "./pages/IKDC";
 import LysholmTegner from "./pages/LysholmTegner";
@@ -34,7 +40,7 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/IKDC" replace />} />
         {/* IKDC sin ID */}
         <Route path="/IKDC" element={<IKDC />} />
         {/* IKDC con ID en path */}
